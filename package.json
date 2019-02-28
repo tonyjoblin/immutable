@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "test": "jest"
+  },
+  "name": "immutable",
+  "version": "0.1.0",
+  "description": "My object path immutable clone",
+  "main": "index.js",
+  "author": "<tonyjoblin@yahoo.com.au>",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "jest": "^24.1.0"
+  }
+}
