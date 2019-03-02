@@ -28,47 +28,26 @@ describe('set', () => {
     expect(result.foo[2]).toBe(5);
   });
   it('sets array', () => {
+    debugger;
     const result = immutable.set({}, 'foo.2', 5);
     expect(Array.isArray(result.foo)).toBeTruthy();
-    expect(result.foo.length).toEqual(3);
-    expect(result.foo[2]).toEqual(5);
+    expect(result.foo).toEqual([,,5]);
+    // expect(result.foo.length).toEqual(3);
+    // expect(result.foo[2]).toEqual(5);
   });
 });
 
-describe('clone', () => {
-  it('null', () => {
-    expect(immutable.clone(null)).toBe(null);
+describe('push', () => {
+  it('onto existing array', () => {
+    const result = immutable.push({ array: [] }, 'array', 1);
+    expect(result.array).toEqual([1]);
   });
-  it('clones simple object', () => {
-    const original = {
-      foo: 5,
-      bar: 'cat'
-    };
-    const dup = immutable.clone(original);
-    expect(dup).toEqual(original);
+  it('into new array', () => {
+    const result = immutable.push({ }, 'array', 1);
+    expect(result.array).toEqual([1]);
   });
-  it('clones nested object', () => {
-    const original = {
-      foo: 5,
-      bar: {
-        foo: 7
-      }
-    };
-    const dup = immutable.clone(original);
-    expect(dup).toEqual(original);
-    expect(dup.bar.foo).toBe(7);
-    expect(original.bar).not.toBe(dup.bar);
+  it('onto nested array', () => {
+    const result = immutable.push({ foo: { bar: [1, 2] } }, 'foo.bar', 3);
+    expect(result.foo.bar).toEqual([1, 2, 3]);
   });
-  it('an array', () => {
-    expect(immutable.clone([1, 2, 3])).toEqual([1, 2, 3]);
-  })
-  it ('object with array property', () => {
-    const src = {
-      foo: [1, 2, 3]
-    };
-    const dup = immutable.clone(src);
-    expect(dup).toEqual(src);
-    expect(dup).not.toBe(src);
-  })
 });
-

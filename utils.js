@@ -15,7 +15,21 @@ function isInteger(val) {
   return !isNaN(parseInt(val));
 }
 
+function clone(src) {
+  if (isObject(src)) {
+    return Object.keys(src).reduce((dup, key) => {
+      dup[key] = clone(src[key]);
+      return dup;
+    }, {});
+  }
+  if (Array.isArray(src)) {
+    return src.map(x => clone(x));
+  }
+  return src; // primitive
+}
+
 module.exports = {
   isObject,
-  isInteger
+  isInteger,
+  clone
 };
