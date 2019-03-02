@@ -51,3 +51,18 @@ describe('push', () => {
     expect(result.foo.bar).toEqual([1, 2, 3]);
   });
 });
+
+describe('del', () => {
+  it('removes key', () => {
+    const result = immutable.del({ foo: 6 }, 'foo');
+    expect(result).toEqual({});
+  });
+  it('removes nested key', () => {
+    const result = immutable.del({ foo: { bar: 5, bat: 7 } }, 'foo.bat');
+    expect(result).toEqual({ foo: { bar: 5 } });
+  });
+  it('deletes item from array', () => {
+    const result = immutable.del({ foo: [1, 2] }, 'foo.0');
+    expect(result).toEqual({ foo: [,2] });
+  });
+});

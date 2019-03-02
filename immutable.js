@@ -1,5 +1,27 @@
 const utils = require('./utils');
 
+// given an iterator (object)
+// walk down the keys described in path
+// path is in a format like 'foo.bar'
+// return an object { it, next } where it is
+// the second last step and next is the last
+// path component
+// Example
+// Given
+// src = {
+//   foo: {
+//     bar: {
+//       baz: 6
+//     }
+//   }
+// }
+// walk(src, 'foo.bar.bat') would return
+// {
+//   it: { baz: 6 },
+//   next: 'bat'
+// }
+// The intention is that the caller can then 
+// add/delete/update/set 'bat' at location it.
 function walk(it, path) {
   const next = path[0];
   if (path.length === 1) {
@@ -20,55 +42,37 @@ function walk(it, path) {
   return walk(it, path.slice(1));
 }
 
-function set(src, path, value) {
+// clone the source object
+// walk the path
+// invoke the action on the last step of the path
+// return the cloned object
+function do_walk(src, path, action) {
   const dup = utils.clone(src);
   pathComponents = path.split('.');
   const { it, next } = walk(dup, pathComponents);
-  it[next] = value;
+  action(it, next);
   return dup;
+}
+
+function set(src, path, value) {
+  return do_walk(src, path, (it, next) => it[next] = value);
 }
 
 function push(src, path, value) {
-  const dup = utils.clone(src);
+  return do_walk(src, path, (it, next) => {
+    if (it[next] === undefined) {
+      it[next] = [];
+    }
+    if (Array.isArray(it[next])) {
+      it[next].push(value);
+    }
+  });
+}
 
-  // function _set(it, path, value) {
-  //   const next = path[0];
-  //   if (path.length === 1) {
-  //     if (it[next] === undefined) {
-  //       it[next] = [];
-  //     }
-  //     if (Array.isArray(it[next])) {
-  //       it[next].push(value);
-  //     }
-  //     return;
-  //   }
-  //   if (utils.isObject(it[next])) {
-  //     it = it[next];
-  //   } else if (Array.isArray(it[next])) {
-  //     it = it[next];
-  //   } else {
-  //     if (utils.isInteger(path[1])) {
-  //       it[next] = [];
-  //     } else {
-  //       it[next] = {};
-  //     }
-  //     it = it[next];
-  //   }
-  //   _set(it, path.slice(1), value);
-  // }
-
-  pathComponents = path.split('.');
-  // _set(dup, pathComponents, value);
-  const { it, next } = walk(dup, pathComponents);
-  if (it[next] === undefined) {
-    it[next] = [];
-  }
-  if (Array.isArray(it[next])) {
-    it[next].push(value);
-  }
-  return dup;
+function del(src, path) {
+  return do_walk(src, path, (it, next) => delete it[next]);
 }
 
 module.exports = {
-  set, push
+  set, push, del
 };
