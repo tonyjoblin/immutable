@@ -1,32 +1,13 @@
-function isObject(val) {
-  if (val === null) {
-    return false;
-  }
-  if (Array.isArray(val)) {
-    return false;
-  }
-  return (typeof val === 'object'); 
-}
-
-function isArray(val) {
-  return Array.isArray(val);
-}
-
-function isInteger(val) {
-  if (isNaN(val)) {
-    return false;
-  }
-  return !isNaN(parseInt(val));
-}
+const utils = require('./utils');
 
 function clone(src) {
-  if (isObject(src)) {
+  if (utils.isObject(src)) {
     return Object.keys(src).reduce((dup, key) => {
       dup[key] = clone(src[key]);
       return dup;
     }, {});
   }
-  if (isArray(src)) {
+  if (Array.isArray(src)) {
     return src.map(x => clone(x));
   }
   return src; // primitive
@@ -36,21 +17,22 @@ function set(src, path, value) {
   const dup = clone(src);
 
   function _set(it, path, value) {
+    const next = path[0];
     if (path.length === 1) {
-      it[path[0]] = value;
+      it[next] = value;
       return;
     }
-    if (isObject(it[path[0]])) {
-      it = it[path[0]];
-    } else if (isArray(it[path[0]])) {
-      it = it[path[0]];
+    if (utils.isObject(it[next])) {
+      it = it[next];
+    } else if (Array.isArray(it[next])) {
+      it = it[next];
     } else {
-      if (isInteger(path[1])) {
-        it[path[0]] = [];
+      if (utils.isInteger(path[1])) {
+        it[next] = [];
       } else {
-        it[path[0]] = {};
+        it[next] = {};
       }
-      it = it[path[0]];
+      it = it[next];
     }
     _set(it, path.slice(1), value);
   }
@@ -61,8 +43,5 @@ function set(src, path, value) {
 
 module.exports = {
   set,
-  clone,
-  isObject,
-  isArray,
-  isInteger
+  clone
 };
